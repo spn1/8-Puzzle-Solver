@@ -1,0 +1,169 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage[margin=1.0in]{geometry}
+\raggedbottom
+\frenchspacing
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\begin{document}
+
+\pagestyle{fancy}
+\lhead{8-Puzzle Search Algorithms}
+\chead{spn1}
+\rhead{Spencer Newton}
+\cfoot{\thepage}
+
+%==================================================================================================
+%								Notes
+%==================================================================================================
+\section{Notes}
+\begin{itemize}
+	\item Max number of states = 9!/2 = 181440.
+	\item Would be 9!, but half of states inaccessible from any start state. 
+\end{itemize}
+
+
+\subsection{Depth First Search}
+\begin{enumerate}
+	\item Stack is initially populated with start state.
+	\item Remove state from top of stack.
+	\item Add all the child nodes of the current state to stack.
+	\item If any of the nodes is the solution then halt.
+	\item Destroy current state.
+	\item Repeat 3 - 6 until program halts (solution found)	
+\end{enumerate}
+
+\begin{itemize}
+	\item \textbf{\underline{Implementation}}
+	\item After adding 4 children to the queue, the order the nodes would be in (starting from the top) is up, left, right, and down. The result of the search would produce very different results if the order they were in the stack was down, right, left, and up, or any other order. If in reverse order, the  	
+	\item Does not find an optimal solution, just finds the first one down a depth branch.	
+\end{itemize}
+
+\subsection{Breadth First Search}
+\begin{enumerate}
+	\item Queue is initially populated with start state.
+	\item Remove first state in queue.
+	\item Add all the child nodes of the current state to end of queue.
+	\item If any of the nodes is the solution then halt.
+	\item Destroy current state.
+	\item Repeat 3 - 6 until program halts (solution found)
+\end{enumerate}
+
+\begin{itemize}
+	\item \textbf{\underline{Implementation}}
+	\item After adding 4 children to the queue, the order the nodes would be in (starting from the tail) is up, left, right, and down.
+	\item Does find an optimal solution, since it ends at a goal node at the lowest depth relative to the start.
+	\item Requires lots of memory as frontier gets very large very quickly.
+\end{itemize}
+
+\subsection{Greedy Best First Search}
+\begin{enumerate}
+	\item Priority Queue is initially populated with start state.
+	\item Remove state from front of queue.
+	\item Add all child nodes in order of increasing path cost (lowest path cost at front). $f(n) = h(n)$ where $h(n)$ is the estimated remaining path cost.
+	\item If any of the nodes is the solution then halt.
+	\item Destroy current state.
+	\item Repeat 3 - 6 until program halts (solution found).
+\end{enumerate}
+
+\begin{itemize}
+	\item \textbf{\underline{Implementation}}
+	\item Children are added to the queue in order of ascending heuristic value (lowest to highest). The heuristic used is the estimated remaining path cost.
+	\item The heuristic is calculated by looking at each number in the grid, calculating it's Manhattan distance from it's desired position, and summing the total distances for all tiles. 
+\end{itemize}
+
+\subsection{A* Search}
+\begin{enumerate}
+	\item Priority Queue is initially populated with start state.
+	\item Remove state from front of queue.
+	\item Add all child nodes in order of increasing function cost. $f(n) = h(n) + g(n)$ where $h(n)$ is the estimated remaining path cost and $g(n)$ is the total path cost so far.
+	\item If any of the nodes is the solution then halt.
+	\item Destroy current state.
+	\item Repeat 3 - 6 until program halts (solution found). \\[0.5cm]
+	
+	\item A* Search finds the optimal solution to a problem so long as the estimated path cost is an underestimate.
+	\item Good compromise between speed and optimality. 
+\end{enumerate}
+
+\begin{itemize}
+	\item \textbf{\underline{Implementation}}
+	\item Children are added to the queue in order of ascending heuristic value (lowest to highest). The heuristic used is a combination of the estimated remaining path cost and the total path cost so far.
+\end{itemize}
+
+
+%==================================================================================================
+%								Implementation
+%==================================================================================================
+\section{Implementation}
+\begin{itemize}
+	\item Briefly looked at pathfinder practical as inspiration, but didn't copy.
+	\item Could test informed searches with different distance heuristic (distance of each tile from goal AND number of tiles out of place)
+	\item Nodes only exist if generate as a child of a node being explored OR if they have already been explore. The entire search tree is not created in the program (unless the search actually explores the entire tree).
+\end{itemize}
+
+\subsection{Architecture}
+\begin{itemize}
+	\item Main Class - Solve = Entry point into program. Describes the execution routine of the program.
+	\item Interface - SolutionFinder = Interface that describes the required methods for any class that wants to be applicable to solving the Puzzle. 
+	\begin{itemize}
+		\item Implementation - BreadthFirstSearch = A class that searches through search space for a solution using a Breadth First Search Algorithm.
+		\item Implementation - DepthFirstSearch = A class that searches through search space for a solution using a Depth First Search Algorithm.
+		\item Implementation - GreedyBestFirstSearch = A class that searches through search space for a solution using a Best-First Search Algorithm with a Greedy Heuristic.
+		\item Implementation - AStarSearch = A class that searches through search space for a solution using the A* Search Algorithm, which includes a heuristic using Manhattan distance and total path cost so far.
+	\end{itemize}
+	\item Class - PuzzleGrid = Represents the properties of a grid state.
+	\item Class - PuzzleNode = Represents the properties of a state found during the search, including the properties relevant to the search (ie Heuristic, Parents, Children).
+	\item Interface - Heuristic = Interface that describes the required methods of any class that wants to be used as a heuristic for a search algorithm.
+	\begin{itemize}
+		\item Implementation - EmptyHeuristic = A class that represents an empty heuristic to be used when an algorithm doesn't use a heuristic (ie Breadth / Depth First Search)
+		\item Implementation - GreedyHeuristic = A class that represents a greedy heuristic (only takes into account total estimated remaining path cast - ie Greedy Best First Search)
+		\item Implmenetation - AStarHeuristic = A class that represents the heuristic used in the A* search (takes into account total estimated remaining path cost and total path cost so far)
+	\end{itemize}
+\end{itemize}
+
+\subsection{Improvements}
+\begin{itemize}
+	\item During searches, I manually checked the list of open states and visited states to see if they already contained child noes. I could have used a List.contains(node) method instead. List.contains() checks for equality using the Object.equals() method, which compares the objects has codes rather than the contents. I could have overridden the hashcode() method in order to generate hash codes based on the contents of the PuzzleGrid, which would have made equals() work in the way I needed it to, and thus use the contains() method. 
+	\item Due to the fact that it iterates through every element in the open states list and the visited states list, the time it takes to inspect each node increases exponentially. Thus the run-times of the algorithms are somewhat exaggerated.
+	\item During searches that used heuristics, I manually compared heuristic values of nodes I needed to insert and the nodes already in the list, in order to determine where to place them. I could have used a PriorityQueue to sort the open states in this case, and implemented the comparable interface in the heuristic classes so that the list could compare heuristics for each node and decide itself where to put them.
+	\item The findSolution() method in each of the search classes contained mostly the same code, with a few tweaks in order to calculate heuristics and change list types (stack, queue, etc). It may have been possible to encapsulate these small difference into another class to avoid repeatedly typing out the code.
+	\item Could have made the SolutionFinder interface an abstract class, since a lot of attributes and functions were identical between the implementations.
+	\item PuzzleNode could have been made private, since it is only really used in the searches.
+\end{itemize}
+
+\section{Experiments}
+\begin{itemize}
+	\item Algorithms were tested with 8 test cases split into two groups. Each group had one specified goal state and four initial states. The program was run using a combination of start / goal state from either group, and one of four search algorithms. The program attempted to find a path of moves from the start state to the goal state using the algorithm, printing out its actions along the way (opening nodes, finding children, sorting children). Once a solution path was found, the program printed out the list of moves to get form start to finish, and then printed an analysis of the search (No. of Nodes, time taken, solution path length).
+	\item \textbf{TEST CASES}: 
+	\item Goal 1 = testGoal1.txt; Goal 2 = tg2.txt;
+	\item Case 1 = testStart1.txt; Case 2 = testStart2.txt; Case 3 = testStart3.txt; Case 4 = testStart4.txt; Case 5 = ts1.txt; Case 6 = ts2.txt; Case 7 = ts3.txt; Case 8 = ts4.txt;
+	\item Case Set 1: Case 1 through 4 to Goal 1; 
+	\item Case Set 2: Case 5 through 8 to Goal 2, Source: \url{http://heuristicswiki.wikispaces.com/Samples+of+8-Puzzle+Start+Boards}
+	\item All tests were run on the same computer, so there shouldn't be any variation on run-times due to hardware / external load. Test computer had an Intel Core i7 Mobile CPU. Tests were also ran on an Intel Core i3 Mobile CPU and the run-times were slower. 
+	\item Nodes searched / solution path are not affected by hardware / external load.
+	\item Should have taken averages for the run times.
+\end{itemize}
+
+\section{Discussion}
+\begin{itemize}
+	\item bfs \& astar always provided optimal solutions. Where the puzzle was complex, dfs searched a much larged volume of space to find the optimal solution.
+	\item gbfs provided optimal solutions to simple problems, however as the puzzles got more complex it resulted in less-optimal solutions.
+	\item For the informed search, gbfs and astar, gbfs often provided solution faster, but were less optimal for more comples cases. astar always provided optimal solutions, similar to bfs, however it often took much longer to do so in terms of time and search space.
+	\item dfs was by far the worst, providing solutions far too long, exploring far too many nodes, and takes too much time. The result of the algorithm varied wildly based on which order child nodes were added to the stack.
+	\item Heuristics Used:
+	\begin{itemize}
+		\item None - for Depth / Breadth first search an 'empty' heuristic is used so that all the states have the same value. This means they will be put in whatever order they were generated in.
+		\item Greedy - H(n) is a function of the Manhattan distance of each tile from its destination position. This is admissible, as it assumes that it can move one tile closer every turn, which in the case of the 8 Puzzle it cannot due to the way the tiles have to be moved (to an empty tile). Will not produce the most optimal solution.
+		\item A* - H(n) is a function of the Manhattan distance of each tile from its destination position and the total path cost so far. The Manhattan distance is admissible, and the total path cost addition will always be equal to the actual path cost due to the fact it is calculate not estimated. This combination of the two means that the A* heuristic used is admissible, and so it will produce an optimal solution.
+	\end{itemize}
+\end{itemize}
+
+%==================================================================================================
+%								Results
+%==================================================================================================
+\section{Results}
+
+\end{document}
