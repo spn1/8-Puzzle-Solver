@@ -4,7 +4,7 @@ Program Written by Spencer Newton
 
 This program will provide the solution (if possible) to any 8-puzzle style solution using the various provided searching algorithms. 
 
-The 8-puzzle game consists of a 3x3 grid where all the sections but one contains a tile with a number on it (from 1 to 8). The tiles can be moved left / right / up / down to an empty section. The goal of the game is to move the files from the arrangement they begin in the a specified goal state, after which the puzzle is considered complete.
+The 8-puzzle game consists of a 3x3 grid where all the sections but one contains a tile with a number on it (from 1 to 8). The tiles can be moved left / right / up / down to an empty section. The goal of the game is to move the tiles from the arrangement they begin in the a specified goal state, after which the puzzle is considered complete.
 
 This program will solve an 8-Puzzle using one of four search algorithms (Depth First Search, Breadth First Search, Greedy Best First Search, and A-Star Search). If a solution is possible, it will print out a list of puzzle states that it has found to get from start to finish.
 
